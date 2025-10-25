@@ -15,9 +15,22 @@ variable "container_port" {
 }
 
 variable "container_cpu" {
-  default = 256
+  description = "ECS task CPU units (256 = 0.25 vCPU, smallest option)"
+  default     = 256
 }
 
 variable "container_memory" {
-  default = 512
+  description = "ECS task memory in MB (512MB, smallest option for CPU 256)"
+  default     = 512
+}
+
+variable "desired_count" {
+  description = "Number of ECS tasks to run (1 = cheapest, 2+ = high availability)"
+  default     = 1
+}
+
+variable "rails_master_key" {
+  description = "Rails master key for credentials encryption"
+  type        = string
+  sensitive   = true
 }

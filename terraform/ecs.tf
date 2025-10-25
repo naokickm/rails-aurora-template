@@ -46,22 +46,18 @@ resource "aws_ecs_task_definition" "app" {
           value = aws_db_instance.main.address
         },
         {
-          name  = "DATABASE_PORT"
-          value = "5432"
-        },
-        {
-          name  = "DATABASE_NAME"
-          value = "railsdb"
-        },
-        {
-          name  = "DATABASE_USER"
-          value = "postgres"
+          name  = "RAILS_LOG_TO_STDOUT"
+          value = "true"
         }
       ]
       secrets = [
         {
-          name      = "DATABASE_PASSWORD"
+          name      = "MYAPP_DATABASE_PASSWORD"
           valueFrom = aws_secretsmanager_secret_version.db_password.arn
+        },
+        {
+          name      = "RAILS_MASTER_KEY"
+          valueFrom = aws_secretsmanager_secret_version.rails_master_key.arn
         }
       ]
       logConfiguration = {
@@ -84,7 +80,7 @@ resource "aws_ecs_service" "app" {
   name            = "${var.app_name}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = 2
+  desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -156,7 +152,10 @@ resource "aws_iam_role_policy" "ecs_task_execution_role_policy" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = aws_secretsmanager_secret_version.db_password.arn
+        Resource = [
+          aws_secretsmanager_secret_version.db_password.arn,
+          aws_secretsmanager_secret_version.rails_master_key.arn
+        ]
       }
     ]
   })
@@ -187,4 +186,13 @@ resource "aws_secretsmanager_secret" "db_password" {
 resource "aws_secretsmanager_secret_version" "db_password" {
   secret_id     = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.db_password.result
+}
+
+resource "aws_secretsmanager_secret" "rails_master_key" {
+  name = "${var.app_name}-rails-master-key"
+}
+
+resource "aws_secretsmanager_secret_version" "rails_master_key" {
+  secret_id     = aws_secretsmanager_secret.rails_master_key.id
+  secret_string = var.rails_master_key
 }
