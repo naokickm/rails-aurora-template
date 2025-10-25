@@ -1,0 +1,26 @@
+# AWS設定
+aws_region = "ap-northeast-1"
+
+# アプリケーション設定
+app_name    = "rails-app"
+environment = "production"
+
+# ECS Fargate設定（最安構成）
+# CPU: 256 (.25 vCPU), 512 (.5 vCPU), 1024 (1 vCPU), 2048 (2 vCPU), 4096 (4 vCPU)
+container_cpu = 256  # 最小 = 最安
+
+# メモリ（MB）: CPUとメモリの組み合わせには制約があります
+# 256 CPU: 512, 1024, 2048
+# 512 CPU: 1024 - 4096 (1GBずつ)
+# 1024 CPU: 2048 - 8192 (1GBずつ)
+container_memory = 512  # 最小 = 最安
+
+# ECSタスク数
+# 1 = 最安（月額 ~$10）
+# 2 = 高可用性（月額 ~$20）
+desired_count = 1
+
+# Rails Master Key
+# config/master.keyの内容をここに貼り付けてください
+# 例: rails_master_key = "abc123def456..."
+rails_master_key = "YOUR_RAILS_MASTER_KEY_HERE"
