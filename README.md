@@ -223,6 +223,34 @@ docker-compose exec web rails db:migrate:status
 docker-compose exec web rails db:drop db:create db:migrate
 ```
 
+## AWSへのデプロイ
+
+このアプリケーションはTerraformを使ってAWSにデプロイできます。
+
+### クイックスタート
+
+```bash
+# 1. 設定ファイルの作成
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+
+# 2. RAILS_MASTER_KEYを設定
+nano terraform.tfvars
+# rails_master_key に config/master.key の内容を貼り付ける
+
+# 3. デプロイ実行
+./deploy.sh
+```
+
+詳細は [terraform/README.md](terraform/README.md) を参照してください。
+
+### デプロイされる構成
+
+- **ECS Fargate**: コンテナ化されたRailsアプリケーション
+- **RDS MySQL 8.0**: マネージドデータベース
+- **ALB**: ロードバランサー
+- **VPC**: プライベートネットワーク環境
+
 ## ディレクトリ構造
 
 ```
@@ -231,7 +259,7 @@ docker-compose exec web rails db:drop db:create db:migrate
 ├── config/           # 設定ファイル
 ├── db/               # データベース関連
 ├── spec/             # RSpecテスト
-├── terraform/        # インフラコード
+├── terraform/        # インフラコード（Terraform）
 ├── Dockerfile        # Dockerイメージ定義
 ├── docker-compose.yml # Docker Compose設定
 └── Gemfile           # Gem依存関係
